@@ -5,24 +5,34 @@ let height = canvas.height
 
 let content = canvas.getContext('2d'); 
 
-let G = 2000;
+let G = 50;
 
 let particles = [];
 
+let msTotal = 0
 let msPrev = window.performance.now()
 let msPassed = 16 / 1000
 
+let maxParticles = 2000
+let nowParticles = 0
+let FramesCounter = 0;
+let MaxFrames = 2;
+
 class Particle {
-    constructor(x, y, radius) {
+    constructor(x, y, ax, ay, radius) {
         this.x_now = x;
         this.y_now = y;
         this.x_old = x;
         this.y_old = y;
         this.vx = 0;
         this.vy = 0;
-        this.ax = 0;
-        this.ay = 0;
+        this.ax = ax;
+        this.ay = ay;
         this.radius = radius;
+        this.color = "rgb(" +
+                    Math.random() * 255 + "," +
+                    Math.random() * 255 + "," +
+                    Math.random() * 255 + ")";
     }
     
     update(dt) {
@@ -38,17 +48,13 @@ class Particle {
         this.ax = 0;
         this.ay = 0;
 
-        // this.handle_box_collision();
-        // for (let i = 0; i < 3; i++) {
-        //     this.handle_between_collision();
-        // }
         this.draw();
     }
 
     draw() {
         content.beginPath();
-        content.arc(this.x_now, this.y_now, this.radius, 0, 2 * Math.PI);
-        content.fillStyle = 'orange';
+        content.arc(this.x_now, this.y_now, this.radius-1, 0, 2 * Math.PI);
+        content.fillStyle = this.color;
         content.fill();
     }
 
@@ -58,57 +64,24 @@ class Particle {
         this.ax += acc_x;
         this.ay += acc_y;
     }
-
-    handle_between_collision() {
-        for (let particle of particles) {
-            if (this === particle) {
-                continue;
-            }
-
-            let dist = Math.sqrt((this.x - particle.x)**2 + (this.y - particle.y)**2);
-            if (dist < this.radius + particle.radius) {
-                console.log('Collision!');
-                let angle = Math.atan2(particle.y - this.y, particle.x - this.x);
-                let dist_to_move = this.radius + particle.radius - dist;
-
-                particle.x += Math.cos(angle) * dist_to_move;
-                particle.y += Math.sin(angle) * dist_to_move;
-
-
-                let tan_v_x = particle.y - this.y;
-                let tan_v_y = -(particle.x - this.x);
-
-                
-            }
-        }
-    }
-
-    handle_box_collision() {
-        if (this.x - this.radius < 0){
-            this.x = this.radius;
-        } else if (this.x + this.radius > width) {
-            this.x = width - this.radius;
-        }
-    
-        if (this.y - this.radius < 0){
-            this.y = this.radius;
-        } else if (this.y + this.radius > height) {
-            this.y = height - this.radius;
-        }
-    }
 }
 
 function add_particles() {
-    for (let i = 0; i < 3; i++) {
-        let x = Math.floor(Math.random() * width); 
-        let y = Math.floor(Math.random() * height); 
-        let vx = Math.floor((Math.random()-0.5) * 1000);
-        let vy = Math.floor((Math.random()-0.5) * 500);
-        let radius = 45; 
-        
-        particles.push(new Particle(x, y, 45));
+    if (nowParticles < maxParticles) {
+        if (FramesCounter < MaxFrames) {
+            FramesCounter += 1;
+        } else {
+            let ax = 6000 * Math.cos(msTotal);
+            let ay = 6000 * Math.abs(Math.sin(msTotal));
+            particles.push(new Particle(width/2 + 100, height/4, ax, ay, 10));
+            particles.push(new Particle(width/2, height/4, ax, ay, 10));
+            particles.push(new Particle(width/2 - 100, height/4, ax, ay, 10));
+            nowParticles += 3;
+            FramesCounter = 0;
+        }
     }
 }
+
 
 function apply_gravity() {
     for (let particle of particles) {
@@ -125,19 +98,49 @@ function update_positions() {
 function apply_constraint() {
     let cx = width / 2;
     let cy = height / 2;
-    let c_radius = height / 2 - 100;
+    let c_radius = height / 2 - 50;
+
+    content.beginPath();
+    content.arc(cx, cy, c_radius, 0, 2 * Math.PI);
+    content.fillStyle = 'gray';
+    content.fill();
 
     for (let particle of particles) {
         let to_part_x = particle.x_now - cx;
         let to_part_y = particle.y_now - cy;
         let dist = Math.sqrt(to_part_x**2 + to_part_y**2);
 
-        if (dist > c_radius - particle.radius) {
+        if (dist >= c_radius - particle.radius) {
             nx = to_part_x / dist;
             ny = to_part_y / dist;
             
             particle.x_now = cx + nx * (c_radius - particle.radius);
             particle.y_now = cy + ny * (c_radius - particle.radius);
+        }
+    }
+}
+
+function handle_between_collision() {
+    for (let particle1 of particles) {
+        for (let particle2 of particles) {
+            if (particle1 === particle2) {
+                continue;
+            }
+    
+            let dist = Math.sqrt((particle1.x_now - particle2.x_now)**2 + (particle1.y_now - particle2.y_now)**2);
+            if (dist < particle1.radius + particle2.radius) {
+    
+                let angle = Math.atan2(particle2.y_now - particle1.y_now, particle2.x_now - particle1.x_now);
+                let dist_to_move = particle1.radius + particle2.radius - dist;
+    
+                particle2.x_now += 0.5 * Math.cos(angle) * dist_to_move;
+                particle2.y_now += 0.5 * Math.sin(angle) * dist_to_move;
+    
+                particle1.x_now -= 0.5 * Math.cos(angle) * dist_to_move;
+                particle1.y_now -= 0.5 * Math.sin(angle) * dist_to_move;
+    
+                
+            }
         }
     }
 }
@@ -150,11 +153,18 @@ function main() {
     
     apply_gravity();
     apply_constraint();
+    handle_between_collision();
     update_positions();
 
-    msPassed = (msNow - msPrev) / 1000
-    document.getElementById("fps_p").innerHTML = "Frame time: " + (Math.round(msPassed * 1000)) + " ms"
-    msPrev = msNow
+    add_particles();
+
+    msPassed = (msNow - msPrev) / 1000;
+    msPrev = msNow;
+    msTotal += msPassed;
+
+    document.getElementById("fps_p").innerHTML = "Frame time: " + (Math.round(msPassed * 1000)) + " ms";
+    document.getElementById("particles_p").innerHTML = "Particles: " + nowParticles;
+
     requestAnimationFrame(main); 
 }
 

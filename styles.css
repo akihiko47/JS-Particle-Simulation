@@ -9,7 +9,15 @@ body {
 
 canvas {
     background-color:black;
-    width: 80%;
-    height: 80%;
+    width: 75%;
 
+}
+
+p {
+    font-size: 2rem;
+    padding: 20px;
+}
+
+#status-bar {
+    display: flex;
 }
