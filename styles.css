@@ -3,21 +3,35 @@ body {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    background-color: #020303;
 
     font-family: "Roboto";
+    color: #fcfdfd;
 }
 
 canvas {
-    background-color:black;
-    width: 75%;
+    background-color:#1d1b1d;
+    width: 80%;
 
+    border-radius: 20px;
+
+}
+
+h1 {
+    font-size: 4rem;
 }
 
 p {
     font-size: 2rem;
-    padding: 20px;
+    padding: 10px;
 }
 
 #status-bar {
     display: flex;
+    justify-content: center;
+    width: 80%;
+    margin: 20px;
+
+    background-color: #1d1b1d;
+    border-radius: 20px;
 }

@@ -18,6 +18,8 @@ let nowParticles = 0
 let FramesCounter = 0;
 let MaxFrames = 2;
 
+let subSteps = 1;
+
 class Particle {
     constructor(x, y, ax, ay, radius) {
         this.x_now = x;
@@ -47,18 +49,7 @@ class Particle {
 
         this.ax = 0;
         this.ay = 0;
-
-        this.draw();
     }
-
-    draw() {
-        content.beginPath();
-        content.arc(this.x_now, this.y_now, this.radius-1, 0, 2 * Math.PI);
-        content.fillStyle = this.color;
-        content.fill();
-    }
-
-
 
     accelerate(acc_x, acc_y) {
         this.ax += acc_x;
@@ -73,12 +64,21 @@ function add_particles() {
         } else {
             let ax = 6000 * Math.cos(msTotal);
             let ay = 6000 * Math.abs(Math.sin(msTotal));
-            particles.push(new Particle(width/2 + 100, height/4, ax, ay, (Math.random() + 0.5) * 10));
-            particles.push(new Particle(width/2, height/4, ax, ay, (Math.random() + 0.5) * 10));
-            particles.push(new Particle(width/2 - 100, height/4, ax, ay, (Math.random() + 0.5) * 10));
+            particles.push(new Particle(width/2 + 100, height/4, ax, ay, (Math.random() + 0.5) * 11));
+            particles.push(new Particle(width/2, height/4, ax, ay, (Math.random() + 0.5) * 11));
+            particles.push(new Particle(width/2 - 100, height/4, ax, ay, (Math.random() + 0.5) * 11));
             nowParticles += 3;
             FramesCounter = 0;
         }
+    }
+}
+
+function draw_particles() {
+    for (let particle of particles) {
+        content.beginPath();
+	content.arc(particle.x_now, particle.y_now, particle.radius-1, 0, 2 * Math.PI, false);
+	content.fillStyle = particle.color;
+	content.fill();
     }
 }
 
@@ -89,9 +89,9 @@ function apply_gravity() {
     }
 }
 
-function update_positions() {
+function update_positions(dt) {
     for (let particle of particles) {
-        particle.update(msPassed);
+        particle.update(dt);
     }
 }
 
@@ -151,12 +151,17 @@ function handle_between_collision() {
 function main() { 
     let msNow = window.performance.now()
 
-    content.clearRect(0, 0, width, height); 
+    content.clearRect(0, 0, width, height);
+
     
-    apply_gravity();
-    apply_constraint();
-    handle_between_collision();
-    update_positions();
+
+    for (let i = 0; i < subSteps; i++) {
+	apply_gravity();
+	apply_constraint();
+	handle_between_collision();
+	update_positions(msPassed / subSteps);
+    }
+    draw_particles();
 
     add_particles();
 
