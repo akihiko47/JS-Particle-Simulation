@@ -5,7 +5,7 @@ let height = canvas.height
 
 let content = canvas.getContext('2d'); 
 
-let G = 50;
+let G = 300;
 
 let particles = [];
 
@@ -30,9 +30,9 @@ class Particle {
         this.ay = ay;
         this.radius = radius;
         this.color = "rgb(" +
-                    Math.random() * 255 + "," +
-                    Math.random() * 255 + "," +
-                    Math.random() * 255 + ")";
+            Math.abs(Math.sin(nowParticles / 800)) * 255 + "," +
+            Math.abs(Math.cos(nowParticles / 1600)) * 255 + "," +
+            Math.abs(Math.sin(nowParticles / 4000)) * 255 + ")";
     }
     
     update(dt) {
