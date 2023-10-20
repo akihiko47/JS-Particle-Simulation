@@ -13,12 +13,14 @@ let msTotal = 0
 let msPrev = window.performance.now()
 let msPassed = 16 / 1000
 
-let maxParticles = 2000
+let maxParticles = 1500
 let nowParticles = 0
 let FramesCounter = 0;
 let MaxFrames = 2;
 
 let subSteps = 1;
+
+let gravityMode = 1;
 
 class Particle {
     constructor(x, y, ax, ay, radius) {
@@ -32,9 +34,9 @@ class Particle {
         this.ay = ay;
         this.radius = radius;
         this.color = "rgb(" +
-            Math.abs(Math.sin(nowParticles / 800)) * 255 + "," +
-            Math.abs(Math.cos(nowParticles / 1600)) * 255 + "," +
-            Math.abs(Math.sin(nowParticles / 4000)) * 255 + ")";
+            Math.abs(Math.sin(nowParticles / 600)) * 255 + "," +
+            Math.abs(Math.cos(nowParticles / 1200)) * 255 + "," +
+            Math.abs(Math.sin(nowParticles / 3000)) * 255 + ")";
     }
     
     update(dt) {
@@ -85,7 +87,22 @@ function draw_particles() {
 
 function apply_gravity() {
     for (let particle of particles) {
-        particle.accelerate(0, G);
+	if (gravityMode == 1) {
+	    let g_x = width / 2;
+	    let g_y = height / 2;
+	    
+	    let dir_x = g_x - particle.x_now;
+	    let dir_y = g_y - particle.y_now;
+
+	    let dist = Math.sqrt(dir_x**2 + dir_y**2);
+
+	    dir_x = dir_x / dist;
+	    dir_y = dir_y / dist;
+	    
+            particle.accelerate(dir_x * G, dir_y * G);
+	} else if (gravityMode == 0) {
+	     particle.accelerate(0, G);
+	}
     }
 }
 
