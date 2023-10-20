@@ -5,7 +5,7 @@ let height = canvas.height
 
 let content = canvas.getContext('2d'); 
 
-let G = 100;
+let G = 600;
 
 let particles = [];
 
@@ -15,12 +15,27 @@ let msPassed = 16 / 1000
 
 let maxParticles = 1500
 let nowParticles = 0
+
 let FramesCounter = 0;
 let MaxFrames = 2;
 
 let subSteps = 1;
 
+// 0 - to bottom
+// 1 - to center
 let gravityMode = 1;
+
+// 0 - box
+// 1 - sphere
+// 2 - borderless box
+let mapMode = 1;
+
+let borderSize = 40;
+
+let grd = content.createLinearGradient(0, 0, 0, height);
+grd.addColorStop(1, "#221f23");
+grd.addColorStop(0, "#11151d");
+
 
 class Particle {
     constructor(x, y, ax, ay, radius) {
@@ -101,7 +116,7 @@ function apply_gravity() {
 	    
             particle.accelerate(dir_x * G, dir_y * G);
 	} else if (gravityMode == 0) {
-	     particle.accelerate(0, G);
+	    particle.accelerate(0, G);
 	}
     }
 }
@@ -113,27 +128,56 @@ function update_positions(dt) {
 }
 
 function apply_constraint() {
-    let cx = width / 2;
-    let cy = height / 2;
-    let c_radius = height / 2 - 50;
 
-    content.beginPath();
-    content.arc(cx, cy, c_radius, 0, 2 * Math.PI);
-    content.fillStyle = 'gray';
-    content.fill();
+    content.fillStyle = '#17181a';
+    content.fillRect(0, 0, width, height);
 
-    for (let particle of particles) {
-        let to_part_x = particle.x_now - cx;
-        let to_part_y = particle.y_now - cy;
-        let dist = Math.sqrt(to_part_x**2 + to_part_y**2);
+    if (mapMode == 0) {
 
-        if (dist >= c_radius - particle.radius) {
-            nx = to_part_x / dist;
-            ny = to_part_y / dist;
-            
-            particle.x_now = cx + nx * (c_radius - particle.radius);
-            particle.y_now = cy + ny * (c_radius - particle.radius);
+        content.fillStyle = grd;
+        content.fillRect(borderSize, borderSize, width - 2*borderSize, height - 2*borderSize);
+
+        for (let particle of particles) {
+            if (particle.x_now + particle.radius > width - borderSize) {
+                particle.x_now = width - borderSize - particle.radius;
+            }
+            if (particle.x_now - particle.radius < borderSize) {
+                particle.x_now = particle.radius + borderSize;
+            }
+            if (particle.y_now + particle.radius > height - borderSize) {
+                particle.y_now = height - particle.radius - borderSize;
+            }
+            if (particle.y_now - particle.radius < borderSize) {
+                particle.y_now = particle.radius + borderSize;
+            }
         }
+    } else if (mapMode == 1) {
+        let cx = width / 2;
+        let cy = height / 2;
+        let c_radius = height / 2 - 50;
+
+        content.beginPath();
+        content.arc(cx, cy, c_radius, 0, 2 * Math.PI);
+        content.fillStyle = grd;
+        content.fill();
+
+        for (let particle of particles) {
+            let to_part_x = particle.x_now - cx;
+            let to_part_y = particle.y_now - cy;
+            let dist = Math.sqrt(to_part_x**2 + to_part_y**2);
+
+            if (dist >= c_radius - particle.radius) {
+                nx = to_part_x / dist;
+                ny = to_part_y / dist;
+                
+                particle.x_now = cx + nx * (c_radius - particle.radius);
+                particle.y_now = cy + ny * (c_radius - particle.radius);
+            }
+        }
+    } else if (mapMode == 2) {
+        content.fillStyle = grd;
+        content.fillRect(0, 0, width, height);
+
     }
 }
 
@@ -145,7 +189,7 @@ function handle_between_collision() {
             }
     
             let col_axis_x = particle1.x_now - particle2.x_now;
-	    let col_axis_y = particle1.y_now - particle2.y_now;
+        let col_axis_y = particle1.y_now - particle2.y_now;
 
 	    let dist = Math.sqrt(col_axis_x**2 + col_axis_y**2);
 
