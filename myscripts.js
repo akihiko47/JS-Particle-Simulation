@@ -5,7 +5,7 @@ let height = canvas.height
 
 let content = canvas.getContext('2d'); 
 
-let G = 300;
+let G = 100;
 
 let particles = [];
 
@@ -73,9 +73,9 @@ function add_particles() {
         } else {
             let ax = 6000 * Math.cos(msTotal);
             let ay = 6000 * Math.abs(Math.sin(msTotal));
-            particles.push(new Particle(width/2 + 100, height/4, ax, ay, 10));
-            particles.push(new Particle(width/2, height/4, ax, ay, 10));
-            particles.push(new Particle(width/2 - 100, height/4, ax, ay, 10));
+            particles.push(new Particle(width/2 + 100, height/4, ax, ay, (Math.random() + 0.5) * 10));
+            particles.push(new Particle(width/2, height/4, ax, ay, (Math.random() + 0.5) * 10));
+            particles.push(new Particle(width/2 - 100, height/4, ax, ay, (Math.random() + 0.5) * 10));
             nowParticles += 3;
             FramesCounter = 0;
         }
@@ -127,20 +127,22 @@ function handle_between_collision() {
                 continue;
             }
     
-            let dist = Math.sqrt((particle1.x_now - particle2.x_now)**2 + (particle1.y_now - particle2.y_now)**2);
-            if (dist < particle1.radius + particle2.radius) {
-    
-                let angle = Math.atan2(particle2.y_now - particle1.y_now, particle2.x_now - particle1.x_now);
-                let dist_to_move = particle1.radius + particle2.radius - dist;
-    
-                particle2.x_now += 0.5 * Math.cos(angle) * dist_to_move;
-                particle2.y_now += 0.5 * Math.sin(angle) * dist_to_move;
-    
-                particle1.x_now -= 0.5 * Math.cos(angle) * dist_to_move;
-                particle1.y_now -= 0.5 * Math.sin(angle) * dist_to_move;
-    
-                
-            }
+            let col_axis_x = particle1.x_now - particle2.x_now;
+	    let col_axis_y = particle1.y_now - particle2.y_now;
+
+	    let dist = Math.sqrt(col_axis_x**2 + col_axis_y**2);
+
+	    if (dist < particle1.radius + particle2.radius) {
+		let n_x = col_axis_x / dist;
+		let n_y = col_axis_y / dist;
+
+		let delta = particle1.radius + particle2.radius - dist;
+
+		particle1.x_now += 0.5 * delta * n_x;
+		particle1.y_now += 0.5 * delta * n_y;
+		particle2.x_now -= 0.5 * delta * n_x;
+		particle2.y_now -= 0.5 * delta * n_y;
+	    }
         }
     }
 }
