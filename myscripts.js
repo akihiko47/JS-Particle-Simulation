@@ -5,7 +5,7 @@ let height = canvas.height
 
 let content = canvas.getContext('2d'); 
 
-let G = 600;
+let G = 200;
 
 let particles = [];
 
