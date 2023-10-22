@@ -1,28 +1,32 @@
 var canvas = document.getElementById("canvas");
 
-let width = canvas.width
-let height = canvas.height
+let width = canvas.width;
+let height = canvas.height;
 
 let content = canvas.getContext('2d'); 
 
-let G = 100;
+let G = 150;
 
 let particles = [];
 
-let msTotal = 0
-let msPrev = window.performance.now()
-let msPassed = 16 / 1000
+let msTotal = 0;
+let msPrev = window.performance.now();
+let msPassed = 16 / 1000;
 
-let maxParticles = 1500
-let nowParticles = 0
+let maxParticles = 100;
+let nowParticles = 0;
 
 let FramesCounter = 0;
 let MaxFrames = 3;
 
 let subSteps = 1;
 
+let mouseX = 0;
+let mouseY = 0;
+
 // 0 - to bottom
 // 1 - to center
+// 2 - to mouse
 let gravityMode = 1;
 
 // 0 - box
@@ -104,19 +108,22 @@ function draw_particles() {
 
 function apply_gravity() {
     for (let particle of particles) {
-	if (gravityMode == 1) {
-	    let g_x = width / 2;
+	if (gravityMode == 1 || gravityMode == 2) {
+        let g_x = width / 2;
 	    let g_y = height / 2;
-	    
-	    let dir_x = g_x - particle.x_now;
-	    let dir_y = g_y - particle.y_now;
 
-	    let dist = Math.sqrt(dir_x**2 + dir_y**2);
+        if (gravityMode == 2) {
+            g_x = mouseX;
+            g_y = mouseY;
+        }
+        
+        let dir_x = g_x - particle.x_now;
+        let dir_y = g_y - particle.y_now;       
+        let dist = Math.sqrt(dir_x**2 + dir_y**2);      
+        dir_x = dir_x / dist;
+        dir_y = dir_y / dist;
 
-	    dir_x = dir_x / dist;
-	    dir_y = dir_y / dist;
-	    
-            particle.accelerate(dir_x * G, dir_y * G);
+        particle.accelerate(dir_x * G, dir_y * G);
 	} else if (gravityMode == 0) {
 	    particle.accelerate(0, G);
 	}
@@ -220,6 +227,25 @@ function reset() {
     nowParticles = 0;
 }
 
+function getMousePosition(canvas, event) { 
+    let rect = canvas.getBoundingClientRect(); 
+    mouseX = (event.clientX - rect.left) / (rect.right - rect.left) * canvas.width;
+    mouseY = (event.clientY - rect.top) / (rect.bottom - rect.top) * canvas.height;
+} 
+
+canvas.addEventListener("mousemove", function(e) 
+        { 
+            getMousePosition(canvas, e); 
+        }); 
+
+document.querySelector("#gravity-slider").oninput = function() {
+    G = this.value;
+}
+
+document.querySelector("#max-slider").oninput = function() {
+    maxParticles = this.value;
+    document.getElementById("max-particles-p").innerHTML = "Max particles: " + maxParticles;
+}
 
 function main() { 
     let msNow = window.performance.now()

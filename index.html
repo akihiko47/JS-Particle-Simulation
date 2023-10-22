@@ -56,6 +56,22 @@
                     <input type="radio" name="gravity-mode" value="1">
                     <span class="checkmark"></span>
                 </label>
+                <label class="container">Mouse
+                    <input type="radio" name="gravity-mode" value="2">
+                    <span class="checkmark"></span>
+                </label>
+            </div>
+
+            <div class="setting">
+                <p>Gravity amount:</p>
+                <hr>
+                <input type="range" id="gravity-slider" name="gravity-amount" min="0" max="1000" value="150" class="slider"/>
+            </div>
+
+            <div class="setting">
+                <p id="max-particles-p">Max particles: 1000</p>
+                <hr>
+                <input type="range" id="max-slider" name="max-slider" min="3" max="2000" value="1000" step="3" class="slider"/>
             </div>
 
             <button class="button" type="button" onclick="reset()">RESET</button>
