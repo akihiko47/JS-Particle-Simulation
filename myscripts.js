@@ -5,7 +5,7 @@ let height = canvas.height
 
 let content = canvas.getContext('2d'); 
 
-let G = 200;
+let G = 100;
 
 let particles = [];
 
@@ -17,7 +17,7 @@ let maxParticles = 1500
 let nowParticles = 0
 
 let FramesCounter = 0;
-let MaxFrames = 2;
+let MaxFrames = 3;
 
 let subSteps = 1;
 
@@ -30,12 +30,14 @@ let gravityMode = 1;
 // 2 - borderless box
 let mapMode = 1;
 
-let borderSize = 40;
+let borderSize = 30;
 
 let grd = content.createLinearGradient(0, 0, 0, height);
 grd.addColorStop(1, "#221f23");
 grd.addColorStop(0, "#11151d");
 
+// colors
+let wallsColor = "#282a36"
 
 class Particle {
     constructor(x, y, ax, ay, radius) {
@@ -79,8 +81,8 @@ function add_particles() {
         if (FramesCounter < MaxFrames) {
             FramesCounter += 1;
         } else {
-            let ax = 6000 * Math.cos(msTotal);
-            let ay = 6000 * Math.abs(Math.sin(msTotal));
+            let ax = 36000 * Math.cos(msTotal);
+            let ay = 36000 * Math.abs(Math.sin(msTotal));
             particles.push(new Particle(width/2 + 100, height/4, ax, ay, (Math.random() + 0.5) * 11));
             particles.push(new Particle(width/2, height/4, ax, ay, (Math.random() + 0.5) * 11));
             particles.push(new Particle(width/2 - 100, height/4, ax, ay, (Math.random() + 0.5) * 11));
@@ -129,7 +131,7 @@ function update_positions(dt) {
 
 function apply_constraint() {
 
-    content.fillStyle = '#17181a';
+    content.fillStyle = wallsColor;
     content.fillRect(0, 0, width, height);
 
     if (mapMode == 0) {
@@ -208,23 +210,34 @@ function handle_between_collision() {
     }
 }
 
+function update_input() {
+    mapMode = parseInt(document.querySelector('input[name="map-mode"]:checked').value);
+    gravityMode = parseInt(document.querySelector('input[name="gravity-mode"]:checked').value);
+}
+
+function reset() {
+    particles = [];
+    nowParticles = 0;
+}
+
 
 function main() { 
     let msNow = window.performance.now()
 
     content.clearRect(0, 0, width, height);
 
-    
 
     for (let i = 0; i < subSteps; i++) {
-	apply_gravity();
-	apply_constraint();
-	handle_between_collision();
-	update_positions(msPassed / subSteps);
+        apply_gravity();
+        apply_constraint();
+        handle_between_collision();
+        update_positions(msPassed / subSteps);
     }
+
     draw_particles();
 
     add_particles();
+    update_input();
 
     msPassed = (msNow - msPrev) / 1000;
     msPrev = msNow;
