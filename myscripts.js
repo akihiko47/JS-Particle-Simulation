@@ -13,13 +13,13 @@ let msTotal = 0;
 let msPrev = window.performance.now();
 let msPassed = 16 / 1000;
 
-let maxParticles = 100;
+let maxParticles = 700; 
 let nowParticles = 0;
 
 let FramesCounter = 0;
-let MaxFrames = 3;
+let MaxFrames = 4;
 
-let subSteps = 1;
+let subSteps = 4;
 
 let mouseX = 0;
 let mouseY = 0;
@@ -56,7 +56,7 @@ class Particle {
         this.radius = radius;
         this.color = "rgb(" +
             Math.abs(Math.sin(nowParticles / 600)) * 255 + "," +
-            Math.abs(Math.cos(nowParticles / 1200)) * 255 + "," +
+            Math.abs(Math.cos(nowParticles / 800)) * 255 + "," +
             Math.abs(Math.sin(nowParticles / 3000)) * 255 + ")";
     }
     
@@ -85,11 +85,11 @@ function add_particles() {
         if (FramesCounter < MaxFrames) {
             FramesCounter += 1;
         } else {
-            let ax = 36000 * Math.cos(msTotal);
-            let ay = 36000 * Math.abs(Math.sin(msTotal));
-            particles.push(new Particle(width/2 + 100, height/4, ax, ay, (Math.random() + 0.5) * 11));
-            particles.push(new Particle(width/2, height/4, ax, ay, (Math.random() + 0.5) * 11));
-            particles.push(new Particle(width/2 - 100, height/4, ax, ay, (Math.random() + 0.5) * 11));
+            let ax = 120000 * Math.cos(msTotal);
+            let ay = 120000 * Math.abs(Math.sin(msTotal));
+            particles.push(new Particle(width/2 + 100, height/4, ax, ay, (Math.random() + 0.5) * 12));
+            particles.push(new Particle(width/2, height/4, ax, ay, (Math.random() + 0.5) * 12));
+            particles.push(new Particle(width/2 - 100, height/4, ax, ay, (Math.random() + 0.5) * 12));
             nowParticles += 3;
             FramesCounter = 0;
         }
