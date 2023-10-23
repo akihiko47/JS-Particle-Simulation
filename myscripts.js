@@ -45,7 +45,7 @@ let wallsColor = "#282a36"
 
 // grid
 grid_size_x = 80;
-grid_size_y = Math.round(grid_size_x * 9 / 16);
+grid_size_y = Math.round(grid_size_x / 1.5);
 let grid = [];
 create_new_grid();
 
