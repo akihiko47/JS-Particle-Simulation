@@ -5,7 +5,7 @@
 Real time JS particle simulation (verlet integration) with static grid optimization. Check out [here](https://akihiko47.github.io/JS-Particle-Simulation/)
 
 ## Usage 🎮
-1. You can copy the directory to make changes using ```git clone https://github.com/akihiko47/Heat-Simulation.git``` or download `.zip` arichve.
+1. You can copy the directory to make changes using ```git clone https://github.com/akihiko47/JS-Particle-Simulation.git``` or download `.zip` arichve.
 2. Or just play [here.](https://akihiko47.github.io/JS-Particle-Simulation/)
 
 ## Settings ⚙️
