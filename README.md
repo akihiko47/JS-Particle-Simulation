@@ -12,8 +12,8 @@ Real time JS particle simulation (verlet integration) with static grid optimizat
 I hope they are intuitive, maybe I'll add more customizations in the future.
 
 ## Plans
-    ✔️ Transfer rendering to GPU
-    ✔️ KD-Trees optimiztion
+- Transfer rendering to GPU
+- KD-Trees optimiztion
 
 ## Contributions
 Contributions are welcomed! 👋
